@@ -1,9 +1,10 @@
 import { Restaurant } from '@prisma/client';
 import prisma from '../prisma';
 import { generateGlovoHeaders } from './restaurantUtils';
+import { shuffleArray } from '../utils';
 
 function generateImageUrl(imageId: string): string {
-  return `https://res.cloudinary.com/glovoapp/q_30,f_auto,c_fill,dpr_1.0,h_156,w_351,b_transparent/${imageId}`;
+  return `https://res.cloudinary.com/glovoapp/q_30,f_auto,c_fill,dpr_1.0,h_400,w_550,b_transparent/${imageId}`;
 }
 
 function extractRestaurantData(storeData: any) {
@@ -30,7 +31,7 @@ export async function getRestaurantsFromGlovo() {
   );
 
   const response = await request.json();
-  const restaurants: any = [];
+  const restaurants: Restaurant[] = [];
 
   response.elements.forEach((element: any) => {
     if (element?.singleData?.type === 'STORE') {
@@ -44,8 +45,22 @@ export async function getRestaurantsFromGlovo() {
     where: { cityCode: restaurants[0].cityCode },
   });
 
-  const res = await prisma.restaurant.createMany({ data: restaurants });
-  console.log(res);
+  await prisma.restaurant.createMany({ data: restaurants });
 
+  return restaurants;
+}
+
+export async function getRestaurantsForCity(
+  cityCode: Restaurant['cityCode'],
+  pagination: number
+) {
+  const take = 50;
+  const restaurants = await prisma.restaurant.findMany({
+    where: { cityCode, open: true },
+    skip: pagination * take,
+    take,
+  });
+
+  shuffleArray(restaurants);
   return restaurants;
 }

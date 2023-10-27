@@ -1,6 +1,9 @@
 import express, { Request, Response, Application } from 'express';
 import dotenv from 'dotenv';
-import { getRestaurantsFromGlovo } from './restaurant/restaurantService';
+import {
+  getRestaurantsForCity,
+  getRestaurantsFromGlovo,
+} from './restaurant/restaurantService';
 import morgan from 'morgan';
 import cors from 'cors';
 import { createRoom } from './room/roomService';
@@ -24,9 +27,18 @@ app.get('/', async (req: Request, res: Response) => {
 });
 
 app.post('/rooms', async (req: Request, res: Response) => {
-  const room = await createRoom(+req.body.size, undefined);
+  const room = await createRoom(req.body, undefined);
 
   res.json(room);
+});
+
+app.get('/cities/:cityCode/:page', async (req: Request, res: Response) => {
+  const restaurants = await getRestaurantsForCity(
+    req.params.cityCode,
+    +req.params.page
+  );
+
+  res.json(restaurants);
 });
 
 app.post('/rooms/:roomId/like', async (req: Request, res: Response) => {

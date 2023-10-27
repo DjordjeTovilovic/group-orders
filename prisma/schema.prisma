@@ -22,10 +22,11 @@ model Restaurant {
 }
 
 model Room {
-  id    Int    @id @default(autoincrement())
-  size  Int
-  likes Like[]
-  users User[]
+  id       Int    @id @default(autoincrement())
+  size     Int
+  cityCode String
+  likes    Like[]
+  users    User[]
 }
 
 model User {
