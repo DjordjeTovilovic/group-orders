@@ -45,7 +45,7 @@ jobs:
         chmod 600 key.pem
     - name: 'Create env file and copy to server'
       run: |
-        echo "${{ secrets.ENV_FILE }}" > .env
+        echo "${{ env.ENV_FILE }}" > .env
         scp -i key.pem .env ec2-user@52.200.94.38:/home/ec2-user
     - name: Pull Docker image
       run: |
