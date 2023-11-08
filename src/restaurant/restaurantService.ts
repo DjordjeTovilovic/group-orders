@@ -56,7 +56,7 @@ export async function getRestaurantsForCity(
 ) {
   const take = 50;
   const restaurants = await prisma.restaurant.findMany({
-    where: { cityCode, open: true },
+    where: { cityCode: cityCode.toUpperCase(), open: true },
     skip: pagination * take,
     take,
   });
