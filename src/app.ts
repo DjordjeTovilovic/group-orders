@@ -19,7 +19,7 @@ app.use(express.json());
 
 const port = process.env.PORT || 8000;
 
-app.get('/', async (req: Request, res: Response) => {
+app.get('/init', async (req: Request, res: Response) => {
   const restaurants = await getRestaurantsFromGlovo();
 
   // console.log(restaurants.length);
