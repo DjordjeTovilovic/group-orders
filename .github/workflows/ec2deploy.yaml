@@ -46,7 +46,7 @@ jobs:
     - name: 'Create env file and copy to server'
       run: |
         echo "${{ env.ENV_FILE }}" > .env
-        scp -i key.pem .env ec2-user@52.200.94.38:/home/ec2-user
+        scp -o StrictHostKeyChecking=no -i key.pem .env ec2-user@52.200.94.38:/home/ec2-user
     - name: Pull Docker image
       run: |
         ssh -o StrictHostKeyChecking=no -i key.pem ec2-user@52.200.94.38 'sudo docker pull gmbt/delinder:latest'
