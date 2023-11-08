@@ -22,7 +22,7 @@ const port = process.env.PORT || 8000;
 app.get('/init', async (req: Request, res: Response) => {
   const restaurants = await getRestaurantsFromGlovo();
 
-  // console.log(restaurants.length);
+  console.log(restaurants.length);
   res.json(restaurants);
 });
 
