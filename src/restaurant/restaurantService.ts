@@ -4,7 +4,7 @@ import { generateGlovoHeaders } from './restaurantUtils';
 import { shuffleArray } from '../utils';
 
 function generateImageUrl(imageId: string): string {
-  return `https://res.cloudinary.com/glovoapp/q_30,f_auto,c_fill,dpr_1.0,h_400,w_550,b_transparent/${imageId}`;
+  return `https://res.cloudinary.com/glovoapp/q_30,f_auto,c_fill,dpr_1.0,h_1800,w_800,b_transparent/${imageId}`;
 }
 
 function extractRestaurantData(storeData: any) {
