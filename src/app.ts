@@ -6,7 +6,7 @@ import {
 } from './restaurant/restaurantService';
 import morgan from 'morgan';
 import cors from 'cors';
-import { createRoom } from './room/roomService';
+import roomService from './room/roomService';
 import { likeRestaurant } from './like/likeService';
 import { eventsHandler, sendEventToRoomMembers } from './eventsUtils';
 import { Like } from '@prisma/client';
@@ -26,12 +26,6 @@ app.get('/init', async (req: Request, res: Response) => {
   res.json(restaurants);
 });
 
-app.post('/rooms', async (req: Request, res: Response) => {
-  const room = await createRoom(req.body, undefined);
-
-  res.json(room);
-});
-
 app.get('/cities/:cityCode/:page', async (req: Request, res: Response) => {
   const restaurants = await getRestaurantsForCity(
     req.params.cityCode,
@@ -41,10 +35,37 @@ app.get('/cities/:cityCode/:page', async (req: Request, res: Response) => {
   res.json(restaurants);
 });
 
+app.post('/rooms', async (req: Request, res: Response) => {
+  const room = await roomService.create(req.body);
+
+  res.json(room);
+});
+
+app.post('/rooms/:roomId/join', async (req: Request, res: Response) => {
+  const room = await roomService.join({
+    userId: req.body.userId,
+    roomId: +req.params.roomId,
+  });
+
+  res.json(room);
+});
+
+app.post('/rooms/:roomId/leave', async (req: Request, res: Response) => {
+  const room = await roomService.leave(req.body.userId);
+
+  res.json(room);
+});
+
+app.post('/rooms/:roomId/start', async (req: Request, res: Response) => {
+  const room = await roomService.start(+req.params.roomId);
+
+  res.json(room);
+});
+
 app.post('/rooms/:roomId/like', async (req: Request, res: Response) => {
   const restaurant: Like = {
     roomId: +req.params.roomId,
-    userId: +req.body.userId,
+    userId: req.body.userId,
     restaurantId: req.body.restaurantId,
   };
   await likeRestaurant(restaurant);

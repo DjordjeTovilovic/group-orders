@@ -7,7 +7,7 @@ export async function likeRestaurant(payload: any) {
     data: {
       restaurantId: payload.restaurantId,
       roomId: +payload.roomId,
-      userId: +payload.userId,
+      userId: payload.userId,
     },
     include: { room: true },
   });
@@ -23,7 +23,7 @@ export async function isWinningRestaurantFound(room: Room) {
   likes.forEach(async (like) => {
     const restaurantId = like.restaurantId;
     hash[restaurantId] = hash[restaurantId] + 1 || 1;
-    if (hash[restaurantId] === room.size) {
+    if (hash[restaurantId] >= room.size) {
       const winingRestaurant = await prisma.restaurant.findFirstOrThrow({
         where: { id: restaurantId },
       });
