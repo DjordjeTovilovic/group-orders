@@ -13,6 +13,7 @@ import { Like } from '@prisma/client';
 
 dotenv.config();
 const app: Application = express();
+require('express-async-errors');
 app.use(morgan('tiny'));
 app.use(cors());
 app.use(express.json());
