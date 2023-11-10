@@ -23,7 +23,6 @@ const port = process.env.PORT || 8000;
 app.get('/init', async (req: Request, res: Response) => {
   const restaurants = await getRestaurantsFromGlovo();
 
-  // console.log(restaurants.length);
   res.json(restaurants);
 });
 
@@ -84,7 +83,7 @@ app.get('/rooms/:roomId/events', eventsHandler);
 
 async function addFact(request: Request, response: Response) {
   const newFact = request.body;
-  // facts.push(newFact);
+
   response.json(newFact);
   return sendEventToRoomMembers(2, newFact);
 }
