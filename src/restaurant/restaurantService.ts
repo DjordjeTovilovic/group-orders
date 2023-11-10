@@ -2,6 +2,8 @@ import { Restaurant } from '@prisma/client';
 import prisma from '../prisma';
 import { generateGlovoHeaders } from './restaurantUtils';
 import { shuffleArray } from '../utils';
+import { sendEventToRoomMembers } from '../eventsUtils';
+import { Like, Room } from '@prisma/client';
 
 function generateImageUrl(imageId: string): string {
   return `https://res.cloudinary.com/glovoapp/q_30,f_auto,c_fill,dpr_1.0,h_1800,w_800,b_transparent/${imageId}`;
@@ -10,7 +12,7 @@ function generateImageUrl(imageId: string): string {
 function extractRestaurantData(storeData: any) {
   const rating = storeData.ratingInfo.cardLabel;
   const restaurant: Restaurant = {
-    id: storeData.id.toString(),
+    id: storeData.id,
     name: storeData.name,
     cityCode: storeData.cityCode,
     imageUrl: generateImageUrl(storeData.imageId),
@@ -23,7 +25,7 @@ function extractRestaurantData(storeData: any) {
   return restaurant;
 }
 
-export async function getRestaurantsFromGlovo() {
+async function getRestaurantsFromGlovo() {
   const headers = generateGlovoHeaders();
   const request = await fetch(
     'https://api.glovoapp.com/v3/feeds/categories/1?limit=351&offset=0',
@@ -50,7 +52,7 @@ export async function getRestaurantsFromGlovo() {
   return restaurants;
 }
 
-export async function getRestaurantsForCity(
+async function getRestaurantsForCity(
   cityCode: Restaurant['cityCode'],
   pagination: number
 ) {
@@ -64,3 +66,36 @@ export async function getRestaurantsForCity(
   shuffleArray(restaurants);
   return restaurants;
 }
+
+async function like(payload: Like) {
+  const like = await prisma.like.create({
+    data: payload,
+    include: { room: true },
+  });
+  console.log(like);
+
+  isWinningRestaurantFound(like.room);
+}
+
+async function isWinningRestaurantFound(room: Room) {
+  const likes = await prisma.like.findMany({ where: { roomId: room.id } });
+  const hash: Record<string, number> = {};
+
+  likes.forEach(async (like) => {
+    const restaurantId = like.restaurantId;
+    hash[restaurantId] = hash[restaurantId] + 1 || 1;
+    if (hash[restaurantId] >= room.size) {
+      const winingRestaurant = await prisma.restaurant.findFirstOrThrow({
+        where: { id: restaurantId },
+      });
+      sendEventToRoomMembers(room.id, winingRestaurant);
+    }
+  });
+  console.log(likes);
+}
+
+export default {
+  getRestaurantsFromGlovo,
+  getRestaurantsForCity,
+  like,
+};

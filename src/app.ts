@@ -1,19 +1,16 @@
-import express, { Request, Response, Application } from 'express';
+import express, { Request, Response, Application, NextFunction } from 'express';
+import 'express-async-errors';
 import dotenv from 'dotenv';
-import {
-  getRestaurantsForCity,
-  getRestaurantsFromGlovo,
-} from './restaurant/restaurantService';
 import morgan from 'morgan';
 import cors from 'cors';
 import roomService from './room/roomService';
-import { likeRestaurant } from './like/likeService';
 import { eventsHandler, sendEventToRoomMembers } from './eventsUtils';
 import { Like } from '@prisma/client';
+import { errorHandler } from './exceptions/errorHandler';
+import restaurantService from './restaurant/restaurantService';
 
 dotenv.config();
 const app: Application = express();
-require('express-async-errors');
 app.use(morgan('tiny'));
 app.use(cors());
 app.use(express.json());
@@ -21,13 +18,13 @@ app.use(express.json());
 const port = process.env.PORT || 8000;
 
 app.get('/init', async (req: Request, res: Response) => {
-  const restaurants = await getRestaurantsFromGlovo();
+  const restaurants = await restaurantService.getRestaurantsFromGlovo();
 
   res.json(restaurants);
 });
 
 app.get('/cities/:cityCode/:page', async (req: Request, res: Response) => {
-  const restaurants = await getRestaurantsForCity(
+  const restaurants = await restaurantService.getRestaurantsForCity(
     req.params.cityCode,
     +req.params.page
   );
@@ -66,9 +63,9 @@ app.post('/rooms/:roomId/like', async (req: Request, res: Response) => {
   const restaurant: Like = {
     roomId: +req.params.roomId,
     userId: req.body.userId,
-    restaurantId: req.body.restaurantId,
+    restaurantId: +req.body.restaurantId,
   };
-  await likeRestaurant(restaurant);
+  await restaurantService.like(restaurant);
 
   res.sendStatus(201);
 });
@@ -89,6 +86,10 @@ async function addFact(request: Request, response: Response) {
 }
 
 app.post('/fact', addFact);
+
+app.use((err: Error, req: Request, res: Response, next: NextFunction) => {
+  errorHandler.handleError(err, res);
+});
 
 app.listen(port, () => {
   console.log(`Server is running at http://0.0.0.0:${port}`);

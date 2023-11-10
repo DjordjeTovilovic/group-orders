@@ -1,4 +1,5 @@
 import { CreateRoom, JoinRoom } from '../common/types';
+import { BadRequestError, NotFoundError } from '../exceptions/appError';
 import prisma from '../prisma';
 
 async function create(createRoom: CreateRoom) {
@@ -24,12 +25,17 @@ async function join(joinRoom: JoinRoom) {
     where: { id: joinRoom.roomId },
     include: { users: true },
   });
-  if (
-    !roomExists ||
-    roomExists?.started === true ||
-    roomExists?.users.some((user) => user.id === joinRoom.userId)
-  ) {
-    return null;
+  if (!roomExists) {
+    throw new NotFoundError(`Room not found`);
+  }
+
+  if (roomExists.started === true) {
+    throw new BadRequestError(`Room already started`);
+  }
+
+  if (roomExists?.users.some((user) => user.id === joinRoom.userId)) {
+    const { users, ...room } = roomExists;
+    return room;
   }
 
   const res = await prisma.room.update({
@@ -65,8 +71,12 @@ async function start(roomId: number) {
     include: { _count: { select: { users: true } } },
   });
 
-  if (!room || room.started === true) {
-    return null;
+  if (!room) {
+    throw new NotFoundError(`Room not found`);
+  }
+
+  if (room.started === true) {
+    throw new BadRequestError(`Room already started`);
   }
 
   const res = await prisma.room.update({
