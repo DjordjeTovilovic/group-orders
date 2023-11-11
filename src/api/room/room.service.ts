@@ -1,6 +1,6 @@
-import { CreateRoom, JoinRoom } from '../common/types';
-import { BadRequestError, NotFoundError } from '../exceptions/appError';
-import prisma from '../prisma';
+import { CreateRoom, JoinRoom } from '../../common/types';
+import { BadRequestError, NotFoundError } from '../../exceptions/appError';
+import prisma from '../../prisma';
 
 async function create(createRoom: CreateRoom) {
   const res = await prisma.room.create({
