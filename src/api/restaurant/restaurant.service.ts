@@ -1,8 +1,8 @@
 import { Restaurant } from '@prisma/client';
-import prisma from '../prisma';
-import { generateGlovoHeaders } from './restaurantUtils';
-import { shuffleArray } from '../utils';
-import { sendEventToRoomMembers } from '../eventsUtils';
+import prisma from '../../prisma';
+import { generateGlovoHeaders } from './restaurant.utils';
+import { shuffleArray } from '../../utils';
+import { sendEventToRoomMembers } from '../../eventsUtils';
 import { Like, Room } from '@prisma/client';
 
 function generateImageUrl(imageId: string): string {
