@@ -1,6 +1,6 @@
-import { CreateRoom, JoinRoom } from '../../common/types';
 import { BadRequestError, NotFoundError } from '../../exceptions/appError';
 import prisma from '../../prisma';
+import { CreateRoom, JoinRoom } from './room.schemas';
 
 async function create(createRoom: CreateRoom) {
   const res = await prisma.room.create({
@@ -16,8 +16,11 @@ async function create(createRoom: CreateRoom) {
       },
     },
   });
-  console.log(res);
-  return res;
+  const joinRoomUrl = `/rooms/${res.id}/join`;
+  const createRoomResponse = { ...res, joinRoomUrl };
+
+  console.log(createRoomResponse);
+  return createRoomResponse;
 }
 
 async function join(joinRoom: JoinRoom) {

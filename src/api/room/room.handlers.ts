@@ -2,6 +2,7 @@ import { Like, Room } from '@prisma/client';
 import { Request, Response } from 'express';
 import roomService from './room.service';
 import restaurantService from '../restaurant/restaurant.service';
+import { JoinRoomBody } from './room.schemas';
 
 export async function createRoom(req: Request, res: Response<Room>) {
   const room = await roomService.create(req.body);
@@ -9,7 +10,10 @@ export async function createRoom(req: Request, res: Response<Room>) {
   res.json(room);
 }
 
-export async function joinRoom(req: Request, res: Response) {
+export async function joinRoom(
+  req: Request<{ roomId: string }, {}, JoinRoomBody>,
+  res: Response
+) {
   const room = await roomService.join({
     userId: req.body.userId,
     roomId: +req.params.roomId,
