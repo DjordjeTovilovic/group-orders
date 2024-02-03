@@ -11,7 +11,7 @@ export const joinRoomSchema = z.object({
 
 export const createRoomSchema = z.object({
   userId: z.string(),
-  cityCode: z.string(),
+  location: z.string(),
 });
 
 export const roomIdSchema = z.object({

@@ -6,7 +6,7 @@ async function create(createRoom: CreateRoom) {
   const res = await prisma.room.create({
     data: {
       size: 1,
-      cityCode: createRoom.cityCode,
+      location: createRoom.location,
       started: false,
       users: {
         connectOrCreate: {
