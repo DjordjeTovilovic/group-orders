@@ -23,18 +23,26 @@ async function create(createRoom: CreateRoom) {
   return createRoomResponse;
 }
 
-async function join(joinRoom: JoinRoom) {
-  const roomExists = await prisma.room.findFirst({
-    where: { id: joinRoom.roomId },
+async function getRoom(roomId: number) {
+  const room = await prisma.room.findFirst({
+    where: { id: roomId },
     include: { users: true },
   });
-  if (!roomExists) {
-    throw new NotFoundError(`Room not found`);
+
+  if (!room) {
+    throw new NotFoundError(`Room with id:${roomId} not found`);
   }
 
-  if (roomExists.started === true) {
-    throw new BadRequestError(`Room already started`);
+  if (room.started === true) {
+    throw new BadRequestError(`Room with id:${roomId} already started`);
   }
+
+  console.log(room);
+  return room;
+}
+
+async function join(joinRoom: JoinRoom) {
+  const roomExists = await getRoom(joinRoom.roomId);
 
   if (roomExists?.users.some((user) => user.id === joinRoom.userId)) {
     const { users, ...room } = roomExists;
@@ -95,6 +103,7 @@ async function start(roomId: number) {
 
 export default {
   create,
+  getRoom,
   join,
   leave,
   start,
