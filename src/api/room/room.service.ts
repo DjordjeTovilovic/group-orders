@@ -24,6 +24,10 @@ async function create(createRoom: CreateRoom) {
 }
 
 async function getRoom(roomId: number) {
+  if (roomId === null || roomId === undefined || isNaN(roomId)) {
+    throw new BadRequestError(`Room id:${roomId} not valid`);
+  }
+
   const room = await prisma.room.findFirst({
     where: { id: roomId },
     include: { users: true },
