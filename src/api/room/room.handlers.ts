@@ -10,7 +10,10 @@ export async function createRoom(req: Request, res: Response<Room>) {
   res.json(room);
 }
 
-export async function getRoom(req: Request, res: Response<Room>) {
+export async function getRoom(
+  req: Request<{ roomId: string }, Room, {}>,
+  res: Response<Room>
+) {
   const roomId = +req.params.roomId;
   const room = await roomService.getRoom(roomId);
 
@@ -18,8 +21,8 @@ export async function getRoom(req: Request, res: Response<Room>) {
 }
 
 export async function joinRoom(
-  req: Request<{ roomId: string }, {}, JoinRoomBody>,
-  res: Response
+  req: Request<{ roomId: string }, Room, JoinRoomBody>,
+  res: Response<Room>
 ) {
   const room = await roomService.join({
     userId: req.body.userId,
