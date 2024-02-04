@@ -5,8 +5,9 @@ import { shuffleArray } from '../../utils';
 import { sendEventToRoomMembers } from '../../eventsUtils';
 import { Like, Room } from '@prisma/client';
 
-function generateImageUrl(imageId: string): string {
-  return `https://res.cloudinary.com/glovoapp/q_30,f_auto,c_fill,dpr_1.0,h_1800,w_800,b_transparent/${imageId}`;
+function generateImageUrl(imageUrl: string): string {
+  const imageId = imageUrl.split('/').at(-1);
+  return `https://images.deliveryhero.io/image/stores-glovo/stores/${imageId}?t=W3siYXV0byI6eyJxIjoibG93In19LHsicmVzaXplIjp7Im1vZGUiOiJmaWxsIiwiYmciOiJ0cmFuc3BhcmVudCIsIndpZHRoIjo1ODgsImhlaWdodCI6MzIwfX1d`;
 }
 
 function extractRestaurantData(storeData: any) {
@@ -38,6 +39,8 @@ async function getRestaurantsFromGlovo() {
   response.elements.forEach((element: any) => {
     if (element?.singleData?.type === 'STORE') {
       const storeData = element.singleData.storeData.store;
+      console.log(storeData);
+
       const restaurant = extractRestaurantData(storeData);
       restaurants.push(restaurant);
     }
