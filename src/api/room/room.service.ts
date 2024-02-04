@@ -40,6 +40,15 @@ async function getRoom(roomId: number) {
   console.log(room);
   return room;
 }
+async function getRoomForUser(userId: string) {
+  const user = await prisma.user.findFirst({
+    where: { id: userId },
+    include: { room: true },
+  });
+
+  console.log(user);
+  return user;
+}
 
 async function join(joinRoom: JoinRoom) {
   const roomExists = await getRoom(joinRoom.roomId);
@@ -104,6 +113,7 @@ async function start(roomId: number) {
 export default {
   create,
   getRoom,
+  getRoomForUser,
   join,
   leave,
   start,

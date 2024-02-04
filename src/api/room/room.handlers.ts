@@ -20,6 +20,16 @@ export async function getRoom(
   res.json(room);
 }
 
+export async function getRoomForUser(
+  req: Request<{ userId: string }, {}, {}>,
+  res: Response
+) {
+  const userId = req.params.userId;
+  const room = await roomService.getRoomForUser(userId);
+
+  res.json(room);
+}
+
 export async function joinRoom(
   req: Request<{ roomId: string }, Room, JoinRoomBody>,
   res: Response<Room>

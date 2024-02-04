@@ -6,6 +6,7 @@ import { validateRequest } from 'zod-express-middleware';
 const router = Router();
 
 router.get('/:roomId', RoomHandlers.getRoom);
+router.get('/users/:userId', RoomHandlers.getRoomForUser);
 router.post(
   '/',
   validateRequest({ body: createRoomSchema }),
