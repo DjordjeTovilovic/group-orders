@@ -39,8 +39,6 @@ async function getRestaurantsFromGlovo() {
   response.elements.forEach((element: any) => {
     if (element?.singleData?.type === 'STORE') {
       const storeData = element.singleData.storeData.store;
-      console.log(storeData);
-
       const restaurant = extractRestaurantData(storeData);
       restaurants.push(restaurant);
     }
